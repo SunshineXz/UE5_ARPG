@@ -1,0 +1,28 @@
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Animation/AnimInstance.h"
+#include "SlashCharacter.h"
+#include "SlashAnimInstance.generated.h"
+
+class UCharacterMovementComponent;
+
+UCLASS()
+class UDEMYARPG_API USlashAnimInstance : public UAnimInstance
+{
+	GENERATED_BODY()
+	
+public:
+	virtual void NativeInitializeAnimation() override;
+	virtual void NativeUpdateAnimation(float DeltaTime) override;
+
+	UPROPERTY(BlueprintReadOnly)
+	ASlashCharacter* SlashCharacter;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement)
+	UCharacterMovementComponent* SlashCharacterMovement;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement)
+	float GroundSpeed;
+};

@@ -6,7 +6,11 @@
 #include "GameFramework/Actor.h"
 #include "Item.generated.h"
 
-UCLASS()
+class USphereComponent;
+
+UCLASS
+
+()
 class UDEMYARPG_API AItem : public AActor
 {
 	GENERATED_BODY()
@@ -29,10 +33,21 @@ protected:
 	UFUNCTION(BlueprintPure)
 	float TransformedCos() const;
 
+	UFUNCTION()
+	virtual void OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+	const FHitResult& SweepResult);
+	
+	UFUNCTION()
+	virtual void OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 private:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* ItemMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float RunningTime = 0.f;
+
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent * Sphere;
 };

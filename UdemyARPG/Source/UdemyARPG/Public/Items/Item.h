@@ -8,9 +8,13 @@
 
 class USphereComponent;
 
-UCLASS
+enum class EItemState : uint8
+{
+	EIS_Hovering,
+	EIS_Equipped
+};
 
-()
+UCLASS()
 class UDEMYARPG_API AItem : public AActor
 {
 	GENERATED_BODY()
@@ -19,13 +23,18 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UStaticMeshComponent* ItemMesh;
+
+	EItemState ItemState = EItemState::EIS_Hovering;
+	
 	virtual void BeginPlay() override;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sine Parameter")
 	float Amplitude = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sine Parameter")
-	float TimeContant = 1.f;
+	float TimeConstant = 1.f;
 
 	UFUNCTION(BlueprintPure)
 	float TransformedSin() const;
@@ -42,8 +51,6 @@ protected:
 	virtual void OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 private:
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* ItemMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float RunningTime = 0.f;

@@ -1,5 +1,6 @@
 #include "Items/Item.h"
 #include "Components/SphereComponent.h"
+#include "Character/SlashCharacter.h"
 AItem::AItem()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -25,38 +26,42 @@ void AItem::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	RunningTime += DeltaTime;
+
+	if(ItemState == EItemState::EIS_Hovering)
+	{
+		AddActorWorldOffset(FVector(0,0,TransformedSin()));
+	}
 }
 
 float AItem::TransformedSin() const
 {
-	return Amplitude * FMath::Sin(RunningTime * TimeContant);
+	return Amplitude * FMath::Sin(RunningTime * TimeConstant);
 }
 
 
 float AItem::TransformedCos() const
 {
-	return Amplitude * FMath::Cos(RunningTime * TimeContant);
+	return Amplitude * FMath::Cos(RunningTime * TimeConstant);
 }
 
 void AItem::OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	const FString OtherActorName = OtherActor->GetName();
-
-	if(GEngine)
+	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
+	if(SlashCharacter)
 	{
-		GEngine->AddOnScreenDebugMessage(1, 2.f, FColor::Red, "Begin" + OtherActorName);
+		SlashCharacter->SetOverlappingItem(this);
 	}
+	
 }
 
 void AItem::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	const FString OtherActorName = OtherActor->GetName();
-
-	if(GEngine)
+	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
+	if(SlashCharacter)
 	{
-		GEngine->AddOnScreenDebugMessage(1, 2.f, FColor::Blue,"End" +  OtherActorName);
+		SlashCharacter->SetOverlappingItem(nullptr);
 	}
 }
 

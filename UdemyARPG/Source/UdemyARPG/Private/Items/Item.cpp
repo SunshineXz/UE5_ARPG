@@ -52,7 +52,6 @@ void AItem::OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
 	{
 		SlashCharacter->SetOverlappingItem(this);
 	}
-	
 }
 
 void AItem::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

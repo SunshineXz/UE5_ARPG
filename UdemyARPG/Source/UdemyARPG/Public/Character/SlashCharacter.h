@@ -25,6 +25,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
+	FString CollisionEnabledToString_Simple(ECollisionEnabled::Type CollisionType);
+
 protected:
 	virtual void BeginPlay() override;
 	
@@ -56,6 +60,15 @@ protected:
 
 	bool CanDisarm();
 	bool CanArm();
+
+	UFUNCTION(BlueprintCallable)
+	void FinishEquipping();
+
+	UFUNCTION(BlueprintCallable)
+	void Disarm();
+
+	UFUNCTION(BlueprintCallable)
+	void Arm();
 
 private:
 

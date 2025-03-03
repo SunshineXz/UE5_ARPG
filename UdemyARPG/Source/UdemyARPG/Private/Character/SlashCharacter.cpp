@@ -13,6 +13,7 @@
 #include "Items/Item.h"
 #include "Items/Weapons/Weapon.h"
 #include "Animation/AnimMontage.h"
+#include "Components/BoxComponent.h"
 
 ASlashCharacter::ASlashCharacter()
 {
@@ -57,7 +58,7 @@ void ASlashCharacter::BeginPlay()
 
 void ASlashCharacter::Move(const FInputActionValue& Value)
 {
-	if(ActionState == EActionState::EAS_Attacking)
+	if(ActionState != EActionState::EAS_Unoccupied)
 		return;
 	
 	const FVector2D MovementVector = Value.Get<FVector2D>();
@@ -101,11 +102,13 @@ void ASlashCharacter::Equip()
 		{
 			PlayEquipMontage(FName("Unequip"));
 			CharacterState = ECharacterState::ECS_Unequipped;
+			ActionState = EActionState::EAS_EquippingWeapon;
 		}
 		else if(CanArm())
 		{
 			PlayEquipMontage(FName("Equip"));
 			CharacterState = ECharacterState::ECS_EquippedTwoHandedWeapon;
+			ActionState = EActionState::EAS_EquippingWeapon;
 		}
 	}
 }
@@ -144,7 +147,6 @@ void ASlashCharacter::PlayEquipMontage(FName SectionName)
 	{
 		AnimInstance->Montage_Play(EquipMontage);
 		AnimInstance->Montage_JumpToSection(SectionName, EquipMontage);
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, SectionName.ToString());
 	}
 }
 
@@ -156,6 +158,27 @@ bool ASlashCharacter::CanDisarm()
 bool ASlashCharacter::CanArm()
 {
 	return ActionState == EActionState::EAS_Unoccupied && CharacterState == ECharacterState::ECS_Unequipped && EquippedWeapon;
+}
+
+void ASlashCharacter::FinishEquipping()
+{
+	ActionState = EActionState::EAS_Unoccupied;
+}
+
+void ASlashCharacter::Disarm()
+{
+	if(EquippedWeapon)
+	{
+		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("SpineSocket"));
+	}
+}
+
+void ASlashCharacter::Arm()
+{
+	if(EquippedWeapon)
+	{
+		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("RightHandSocket"));
+	}
 }
 
 void ASlashCharacter::Tick(float DeltaTime)
@@ -177,6 +200,27 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Equip);
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Dodge);
 
+	}
+}
+
+void ASlashCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
+{
+	if(EquippedWeapon && EquippedWeapon->GetWeaponBox())
+	{
+		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
+		EquippedWeapon->IgnoreActors.Empty();
+	}
+}
+
+FString ASlashCharacter::CollisionEnabledToString_Simple(ECollisionEnabled::Type CollisionType)
+{
+	switch (CollisionType)
+	{
+	case ECollisionEnabled::NoCollision: return TEXT("NoCollision");
+	case ECollisionEnabled::QueryOnly: return TEXT("QueryOnly");
+	case ECollisionEnabled::PhysicsOnly: return TEXT("PhysicsOnly");
+	case ECollisionEnabled::QueryAndPhysics: return TEXT("QueryAndPhysics");
+	default: return TEXT("Unknown");
 	}
 }
 

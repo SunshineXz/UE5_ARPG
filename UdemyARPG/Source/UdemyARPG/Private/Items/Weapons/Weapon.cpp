@@ -86,7 +86,7 @@ void AWeapon::OnBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor
 		this,
 		Start,
 		End,
-		FVector(5,5,5),
+		FVector(50,50,50),
 		BoxTraceStart->GetComponentRotation(),
 		TraceTypeQuery1,
 		false,
@@ -101,8 +101,9 @@ void AWeapon::OnBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor
 		IHitInterface * HitInterface = Cast<IHitInterface>(BoxHit.GetActor());
 		if(HitInterface)
 		{
-			HitInterface->GetHit(BoxHit.ImpactPoint);
+			HitInterface->Execute_GetHit(BoxHit.GetActor(), BoxHit.ImpactPoint);
 		}
 		IgnoreActors.AddUnique(BoxHit.GetActor());
+		CreateFields(BoxHit.ImpactPoint);
 	}
 }
